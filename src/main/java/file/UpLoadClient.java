@@ -171,7 +171,7 @@ public class UpLoadClient {
 
     public static void main(String[] args) throws Exception {
         UpLoadClient client = new UpLoadClient("127.0.0.1",8888);
-        client.uploadFile("C:\\Users\\asus\\Desktop\\image\\ÉçÇø.jpg");
+        client.uploadFile("C:\\Users\\asus\\Desktop\\image\\meout.jpg");
     }
 }
 

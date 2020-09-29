@@ -90,7 +90,7 @@ public class DBServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     private String sanitizeUri(String uri) {
         try {
-            uri = URLDecoder.decode(uri, "GBK");
+            uri = URLDecoder.decode(uri, "UTF-8");
         } catch(UnsupportedEncodingException e) {
             try {
                 uri = URLDecoder.decode(uri, "ISO-8859-1");
@@ -139,8 +139,9 @@ public class DBServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (fileUpload.isCompleted()) {
 
                 StringBuffer fileNameBuf = new StringBuffer();
-                fileNameBuf.append(DiskFileUpload.baseDirectory)
-                        .append(uri);
+//                fileNameBuf.append(DiskFileUpload.baseDirectory)
+//                        .append(uri);
+                fileNameBuf.append(uri);
 
                 fileUpload.renameTo(new File(fileNameBuf.toString()));
             }
