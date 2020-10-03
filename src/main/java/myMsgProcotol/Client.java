@@ -27,8 +27,13 @@ public class Client {
                             p.addLast(new MyEncoder());
                             p.addLast(new ChannelInboundHandlerAdapter(){
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                                    StringBuilder sb = new StringBuilder();
+                                    for (int i = 0; i < 100; i++) {
+                                        sb.append("abcd");
+                                    }
+                                    String s = sb.toString();
 
-                                    ctx.writeAndFlush(new MyMessage(new MyHead("abcd".getBytes("UTF-8").length,1),"abcd"));
+                                    ctx.writeAndFlush(new MyMessage(new MyHead(s.getBytes("UTF-8").length,1),s));
 
                                 }
 
