@@ -32,6 +32,9 @@ LongClient类中main方法会while循环发业务消息，如果屏蔽while循�
 
 首先启动服务端，然后再启动客户端，通过控制台可以看到，发送较大字符串，服务接收的数据分成了2次,这就是我们要解决的问题。
 
+## @Sharable
+netty的ChannelHandler如果带有@Sharable表示多个channel可以共用一个，否则不行，很多解码器里因为存有Channel的状态变量，所以很多不带@Sharable
+
 ## LineBasedFrameDecoder
 
 服务端，入站最前方加上
@@ -54,7 +57,7 @@ channel.writeAndFlush(msg+System.getProperty("line.separator"));
 
 ## FixedLengthFrameDecoder
 
-提前知道客户端消息长度，服务端解析固定长度，不过要注意这个解码器会保存channel状态变量，属于有状态连接，会有线程安全问题
+提前知道客户端消息长度，服务端解析固定长度
 
 ```java
 ch.pipeline().addLast(new FixedLengthFrameDecoder(1300));
