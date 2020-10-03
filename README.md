@@ -54,7 +54,7 @@ channel.writeAndFlush(msg+System.getProperty("line.separator"));
 
 ## FixedLengthFrameDecoder
 
-提前知道客户端消息长度，服务端解析固定长度
+提前知道客户端消息长度，服务端解析固定长度，不过要注意这个解码器会保存channel状态变量，属于有状态连接，会有线程安全问题
 
 ```java
 ch.pipeline().addLast(new FixedLengthFrameDecoder(1300));
