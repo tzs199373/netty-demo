@@ -15,9 +15,65 @@
 2、响应中的header描述length很重要，如果没有，你会发现用postman发出请求之后就一直在刷新，因为http请求方不知道返回的数据到底有多长。channel读取完成之后需要输出缓冲流。如果没有，你会发现postman同样会一直在刷新。
 
 # longConnection 
+
 自定义消息协议通讯及心跳检测例子
 
 LongClient类中main方法会while循环发业务消息，如果屏蔽while循环，client一段时间没有读写事件，就会触发userEventTriggered事件，前提是有IdleStateHandler。该方法中发送ping消息（心跳）。
 
 # file
+
 文件传输
+
+# packetProblem
+
+粘包拆包问题
+
+## 问题展示
+
+首先启动服务端，然后再启动客户端，通过控制台可以看到，发送较大字符串，服务接收的数据分成了2次,这就是我们要解决的问题。
+
+## LineBasedFrameDecoder
+
+服务端，入站最前方加上
+
+```java
+ch.pipeline().addLast(new LineBasedFrameDecoder(10240));
+```
+
+客户端发送末尾加上换行符
+
+```java
+channel.writeAndFlush(msg+System.getProperty("line.separator"));
+```
+
+运行后，服务端只收到一次消息，客户端还是收到两次回复，因为客户端未做处理
+
+## DelimiterBasedFrameDecoder
+
+和LineBasedFrameDecoder一样，这里可以自定义分隔符
+
+## FixedLengthFrameDecoder
+
+提前知道客户端消息长度，服务端解析固定长度
+
+```java
+ch.pipeline().addLast(new FixedLengthFrameDecoder(1300));
+```
+
+客户端直接发送即可
+
+## LengthFieldBasedFrameDecoder
+
+数据包长度 = lengthFieldOffset + lengthFieldLength + lengthAdjustment+长度域的值 
+
+lengthFieldOffset：长度字段偏移量
+
+lengthFieldLength：长度字段所占字节数
+
+lengthAdjustment：长度字段的补偿值
+
+ initialBytesToStrip ：从解码帧中第一次去除的字节数
+
+# myMsgProcotol
+
+自定义消息与编解码
