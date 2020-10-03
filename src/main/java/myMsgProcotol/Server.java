@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.ReferenceCountUtil;
 
 public class Server {
@@ -19,8 +20,8 @@ public class Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // (5)
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-
-                            ch.pipeline().addLast(new MyEncoder())
+                            ch.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 4, 0))
+                                    .addLast(new MyEncoder())
                                     .addLast(new MyDecoder())
                                     .addLast( new ChannelInboundHandlerAdapter() {
                                         @Override
@@ -28,7 +29,6 @@ public class Server {
                                             MyMessage in = (MyMessage) msg;
                                             try {
                                                 System.out.println("server get :" + in);
-
                                             } finally {
                                                 //ByteBuf是一个引用计数对象，这个对象必须显示地调用release()方法来释放
                                                 ReferenceCountUtil.release(msg);

@@ -28,7 +28,7 @@ public class Client {
                             p.addLast(new ChannelInboundHandlerAdapter(){
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                     StringBuilder sb = new StringBuilder();
-                                    for (int i = 0; i < 100; i++) {
+                                    for (int i = 0; i < 1000; i++) {
                                         sb.append("abcd");
                                     }
                                     String s = sb.toString();

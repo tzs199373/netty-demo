@@ -86,6 +86,8 @@ failFast：true: 读取到长度域超过maxFrameLength，就抛出一个 TooLon
 false: 只有真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException。
 默认情况下设置为true，建议不要修改，否则可能会造成内存溢出。
 
+tip:关于LengthFieldBasedFrameDecoder用法在myMsgProcotol包中也有体现
+
 # myMsgProcotol
 
 自定义消息与编解码
