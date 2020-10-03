@@ -69,13 +69,19 @@ ch.pipeline().addLast(new FixedLengthFrameDecoder(1300));
 
 数据包长度 = lengthFieldOffset + lengthFieldLength + lengthAdjustment+长度域的值 
 
+ByteOrder：数据存储采用大端模式或小端模式，网络传输默认大端模式
+
 lengthFieldOffset：长度字段偏移量
 
 lengthFieldLength：长度字段所占字节数
 
 lengthAdjustment：长度字段的补偿值
 
- initialBytesToStrip ：从解码帧中第一次去除的字节数
+initialBytesToStrip ：从解码帧中第一次去除的字节数
+
+failFast：true: 读取到长度域超过maxFrameLength，就抛出一个 TooLongFrameException。
+false: 只有真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException.
+默认情况下设置为true，建议不要修改，否则可能会造成内存溢出
 
 # myMsgProcotol
 
