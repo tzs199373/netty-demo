@@ -1,6 +1,8 @@
 package packetProblem.lengthField;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -21,7 +23,7 @@ public class client {
                 @Override
             public void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast("decoder", new StringDecoder());
-                ch.pipeline().addLast("encoder", new StringEncoder());
+//                ch.pipeline().addLast("encoder", new StringEncoder());
                 ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                     @Override
                 public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -37,7 +39,12 @@ public class client {
             for (int i = 0; i < 100; i++) {
                 msg.append("server hello.");
             }
-            channel.writeAndFlush(msg);
+
+            ByteBuf buf = Unpooled.buffer(1304);
+            buf.writeInt(1300);
+            buf.writeBytes(msg.toString().getBytes());
+
+            channel.writeAndFlush(buf);
         } catch(Exception e) {
             e.printStackTrace();
         }
