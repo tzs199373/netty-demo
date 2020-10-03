@@ -77,7 +77,7 @@ lengthFieldLength：长度字段所占字节数
 
 lengthAdjustment：长度字段的补偿值
 
-initialBytesToStrip ：从解码帧中第一次去除的字节数
+initialBytesToStrip ：从解码帧中第一次去除的字节数，通俗地说netty拿到一个完整的数据包之后向业务解码器传递之前，应该跳过多少字节
 
 failFast：true: 读取到长度域超过maxFrameLength，就抛出一个 TooLongFrameException。
 false: 只有真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException.
