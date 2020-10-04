@@ -91,3 +91,7 @@ tip:关于LengthFieldBasedFrameDecoder用法在myMsgProcotol包中也有体现
 # myMsgProcotol
 
 自定义消息与编解码
+
+# longTimeTask
+
+netty处理耗时任务，使用Netty提供的的EventExecutorGroup
