@@ -118,7 +118,7 @@ public class UpLoadClient {
             pipeline.addLast("encoder", new HttpRequestEncoder());
             pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
-            pipeline.addLast("dispatcher", new UpLoadClientHandler());
+//            pipeline.addLast("dispatcher", new UpLoadClientHandler());
         }
     }
 

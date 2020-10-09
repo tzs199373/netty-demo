@@ -1,15 +1,14 @@
-package packetProblem.line;
+package packetProblem.problem;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-public class client {
+public class Client {
     public static void main(String[] args) {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         Channel channel = null;
@@ -38,7 +37,7 @@ public class client {
             for (int i = 0; i < 100; i++) {
                 msg.append("server hello.");
             }
-            channel.writeAndFlush(msg+System.getProperty("line.separator"));
+            channel.writeAndFlush(msg);
         } catch(Exception e) {
             e.printStackTrace();
         }

@@ -95,3 +95,7 @@ tip:关于LengthFieldBasedFrameDecoder用法在myMsgProcotol包中也有体现
 # longTimeTask
 
 netty处理耗时任务，使用Netty提供的的EventExecutorGroup
+
+# concurrencyProblem
+
+模拟并发及延迟问题，服务端对某个请求响应慢，发现顺序并没有乱，但有部分请求和那个慢请求一样被阻塞了

@@ -8,7 +8,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-public class client {
+public class Client {
     public static void main(String[] args) {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         Channel channel = null;
