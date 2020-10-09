@@ -39,13 +39,6 @@ public class Client {
                     @Override
                     public void run() {
                         String name = Thread.currentThread().getName();
-//                        if(Integer.valueOf(name) % 100 == 0){
-//                            try {
-//                                Thread.sleep(100);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
                         channel.writeAndFlush(name+System.lineSeparator());
                     }
                 });
