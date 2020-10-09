@@ -28,7 +28,6 @@ public class Server{
                 .childHandler(new ChannelInitializer<SocketChannel>(){
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new LineBasedFrameDecoder(10240));
                         ch.pipeline().addLast("decoder", new StringDecoder());
                         ch.pipeline().addLast("encoder", new StringEncoder());
                         ch.pipeline().addLast(business,new ChannelInboundHandlerAdapter() {
@@ -42,7 +41,7 @@ public class Server{
                                         e.printStackTrace();
                                     }
                                 }
-                                ctx.writeAndFlush(msg.toString()+System.lineSeparator());
+                                ctx.writeAndFlush(msg.toString());
                             }
                         });
                     }
