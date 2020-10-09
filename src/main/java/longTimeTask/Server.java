@@ -12,9 +12,9 @@ import io.netty.util.concurrent.EventExecutorGroup;
 
 import java.net.InetSocketAddress;
 
-public class EchoServer {
+public class Server {
     private final int port;
-    public EchoServer(int port) {
+    public Server(int port) {
         this.port = port;
     }
     public void start() throws Exception {
@@ -42,18 +42,18 @@ public class EchoServer {
                                 public void channelRead(ChannelHandlerContext ctx, Object msg) {
                                     //模拟耗时任务
                                     try {
-                                        Thread.sleep(5000);
-                                        System.out.printf("%s execute time 5s \n", Thread.currentThread().getName());
+                                        Thread.sleep(15000);
+                                        System.out.printf("%s execute time 15s \n", Thread.currentThread().getName());
                                     } catch (InterruptedException e) {
                                         Thread.currentThread().interrupt();
                                     }
-                                    ctx.writeAndFlush(msg );
+                                    ctx.writeAndFlush(msg);
                                 }
                             });
                         }
                     });
             ChannelFuture f = b.bind().sync();
-            System.out.println(String.format("%s started and listen on %s", EchoServer.class.getName(), f.channel().localAddress()));
+            System.out.println(String.format("%s started and listen on %s", Server.class.getName(), f.channel().localAddress()));
             f.channel().closeFuture().sync();
         } finally {
             boss.shutdownGracefully().sync();
@@ -63,7 +63,7 @@ public class EchoServer {
     }
 
     public static void main(String[] args) throws Exception {
-        new EchoServer(8080).start();
+        new Server(8080).start();
     }
 }
 

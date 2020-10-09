@@ -94,7 +94,11 @@ tip:关于LengthFieldBasedFrameDecoder用法在myMsgProcotol包中也有体现
 
 # longTimeTask
 
-netty处理耗时任务，使用Netty提供的的EventExecutorGroup
+netty处理耗时任务，使用Netty提供的的EventExecutorGroup，注意这里并不是开启异步处理慢业务，以提高响应速度
+
+这里的目的只是尽量避免使用NioEventLoop处理慢业务，因为依旧是同步响应，所以还是慢
+
+如果客户端不需要慢业务的处理结果，应该在慢业务处开启多线程异步处理
 
 # concurrencyProblem
 
