@@ -15,12 +15,6 @@ public class Server{
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        EventExecutorGroup business = new DefaultEventExecutorGroup(200,(Runnable r)->{
-            Thread thread =  new Thread(r);
-            thread.setDaemon(false);
-            thread.setName("netty-context-business");
-            return  thread;
-        });
 
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
@@ -30,13 +24,15 @@ public class Server{
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast("decoder", new StringDecoder());
                         ch.pipeline().addLast("encoder", new StringEncoder());
-                        ch.pipeline().addLast(business,new ChannelInboundHandlerAdapter() {
+                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                System.out.println("server read:"+msg);
+                                String tName = Thread.currentThread().getName();
+                                int remotePort = ((SocketChannel)ctx.channel()).remoteAddress().getPort();//¿Í»§¶Ë¶Ë¿Ú
+                                System.out.println("server["+tName+"] remotePort:"+remotePort+" read:"+msg);
                                 if(Integer.valueOf(msg+"")  == 0){
                                     try {
-                                        Thread.sleep(10000);
+                                        Thread.sleep(15000);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }

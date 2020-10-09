@@ -11,13 +11,21 @@ import io.netty.handler.codec.string.StringEncoder;
 
 public class Client {
     public static void main(String[] args) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 20; i++) {
             Thread t = new Thread(()->{
                 Client client = new Client();
                 client.start(Thread.currentThread().getName());
             });
             t.setName(i+"");
+
             t.start();
+            if(i==0){
+                try {
+                    Thread.sleep(2000);//保证i=0第一个请求服务端
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
