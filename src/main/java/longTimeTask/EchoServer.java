@@ -1,9 +1,7 @@
 package longTimeTask;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -39,7 +37,19 @@ public class EchoServer {
                             ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast(new StringDecoder());
                             pipeline.addLast(new StringEncoder());
-                            pipeline.addLast(business, new EchoServerHandler());
+                            pipeline.addLast(business, new ChannelInboundHandlerAdapter(){
+                                @Override
+                                public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                                    //模拟耗时任务
+                                    try {
+                                        Thread.sleep(5000);
+                                        System.out.printf("%s execute time 5s \n", Thread.currentThread().getName());
+                                    } catch (InterruptedException e) {
+                                        Thread.currentThread().interrupt();
+                                    }
+                                    ctx.writeAndFlush(msg );
+                                }
+                            });
                         }
                     });
             ChannelFuture f = b.bind().sync();
