@@ -44,6 +44,9 @@ public class Client {
                 });
                 t.setName(i+"");
                 t.start();
+                if(i == 0){
+                    Thread.sleep(2000);//保证线程i=0优先
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();

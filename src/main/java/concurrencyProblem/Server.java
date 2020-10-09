@@ -29,7 +29,7 @@ public class Server{
                                 System.out.println("server read:"+msg);
                                 if(Integer.valueOf(msg+"")  == 0){
                                     try {
-                                        Thread.sleep(5000);
+                                        Thread.sleep(10000);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
