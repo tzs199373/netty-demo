@@ -27,9 +27,6 @@ public class Server{
                         ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                String tName = Thread.currentThread().getName();
-                                int remotePort = ((SocketChannel)ctx.channel()).remoteAddress().getPort();//客户端端口
-                                System.out.println("server["+tName+"] remotePort:"+remotePort+" read:"+msg);
                                 if(Integer.valueOf(msg+"")  == 0){
                                     try {
                                         Thread.sleep(15000);
@@ -37,6 +34,9 @@ public class Server{
                                         e.printStackTrace();
                                     }
                                 }
+                                String tName = Thread.currentThread().getName();
+                                int remotePort = ((SocketChannel)ctx.channel()).remoteAddress().getPort();//客户端端口
+                                System.out.println("server["+tName+"] remotePort:"+remotePort+" read:"+msg);
                                 ctx.writeAndFlush(msg.toString());
                             }
                         });
