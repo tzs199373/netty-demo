@@ -25,11 +25,10 @@ public class Client {
                     p.addLast(new HttpRequestEncoder());
                     p.addLast(new HttpResponseDecoder());
                     p.addLast(new HttpObjectAggregator(8192));
-                    p.addLast(new HttpContentDecompressor());
                 }
             });
 
-            ChannelFuture f = b.connect("192.168.137.67", 8888).sync();
+            ChannelFuture f = b.connect("127.0.0.1", 8888).sync();
             uploadZipFile("/upload",new File("C:\\Users\\asus\\Desktop\\1.zip"),f.channel());
         } catch(Exception e) {
             e.printStackTrace();
