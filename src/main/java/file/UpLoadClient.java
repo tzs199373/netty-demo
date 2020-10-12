@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.List;
 
 public class UpLoadClient {
-    private StringBuffer resultBuffer = new StringBuffer();
     private EventLoopGroup group = null;
     private HttpDataFactory factory = null;
     private ChannelFuture future = null;
@@ -65,34 +64,6 @@ public class UpLoadClient {
             pipeline.addLast("decoder", new HttpResponseDecoder());
             pipeline.addLast("encoder", new HttpRequestEncoder());
             pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-//            pipeline.addLast("dispatcher", new UpLoadClientHandler());
-        }
-    }
-
-    private class UpLoadClientHandler extends SimpleChannelInboundHandler<HttpObject> {
-        private boolean readingChunks = false;
-        private int succCode = 200;
-
-        protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg)
-                throws Exception {
-            if (msg instanceof HttpResponse) {
-                HttpResponse response = (HttpResponse) msg;
-                succCode = response.getStatus().code();
-                if (succCode == 200 && HttpHeaders.isTransferEncodingChunked(response)) {
-                    readingChunks = true;
-                }
-            }
-            if (msg instanceof HttpContent) {
-                HttpContent chunk = (HttpContent) msg;
-                System.out.println("¡¾ÏìÓ¦¡¿"+succCode+">>"+chunk.content().toString(CharsetUtil.UTF_8));
-                if (chunk instanceof LastHttpContent) {
-                    readingChunks = false;
-                }
-            }
-            if (!readingChunks) {
-                resultBuffer.append(succCode);
-                ctx.channel().close();
-            }
         }
     }
 
