@@ -62,8 +62,10 @@ public class UpLoadClient {
 
     public static void main(String[] args) throws Exception {
         UpLoadClient client = new UpLoadClient();
-        ChannelFuture f = client.initClient("127.0.0.1",8888);
-        client.uploadFile("1.zip",new File("C:\\Users\\asus\\Desktop\\image\\1.zip"),f.channel(),"application/x-zip-compressed");
+        ChannelFuture f = client.initClient("192.168.0.105",8888);
+//        client.uploadFile("1.zip",new File("C:\\Users\\asus\\Desktop\\image\\1.zip"),f.channel(),"application/x-zip-compressed");
+        client.uploadFile("meout.jpg",new File("C:\\Users\\asus\\Desktop\\image\\meout.jpg"),f.channel(),HttpHeaderValues.APPLICATION_OCTET_STREAM.toString());
+
     }
 }
 
