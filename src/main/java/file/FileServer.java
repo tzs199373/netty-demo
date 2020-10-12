@@ -49,16 +49,12 @@ public class FileServer{
     }
 
     private class FileServerInitializer extends ChannelInitializer<SocketChannel> {
-
         @Override
         public void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
-
             pipeline.addLast("decoder", new HttpRequestDecoder());
             pipeline.addLast("encoder", new HttpResponseEncoder());
-
             pipeline.addLast("deflater", new HttpContentCompressor());
-
             pipeline.addLast("handler", new FileServerHandler());
         }
     }
@@ -70,9 +66,6 @@ public class FileServer{
         private HttpPostRequestDecoder decoder;
         private int num = 0;
         private String type = "message";
-        public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
-        public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
-        public static final int HTTP_CACHE_SECONDS = 60;
 
         static {
             DiskFileUpload.baseDirectory = System.getProperty("user.dir");//程序运行环境根目录
@@ -129,27 +122,18 @@ public class FileServer{
                     throw new Error();
                 }
             }
-
             return uri;
         }
 
         private void reset() {
             request = null;
-
-            //销毁decoder释放所有的资源
             decoder.destroy();
-
             decoder = null;
         }
 
-        /**
-         * 通过chunk读取request，获取chunk数据
-         * @throws IOException
-         */
         private void readHttpDataChunkByChunk() throws IOException {
             try {
                 while (decoder.hasNext()) {
-
                     InterfaceHttpData data = decoder.next();
                     if (data != null) {
                         try {
@@ -179,66 +163,6 @@ public class FileServer{
             } else if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
 
             }
-        }
-
-        private void writeDownLoadResponse(ChannelHandlerContext ctx, RandomAccessFile raf, File file) throws Exception {
-            long fileLength = raf.length();
-
-            //判断是否关闭请求响应连接
-            boolean close = HttpHeaders.Values.CLOSE.equalsIgnoreCase(request.headers().get(CONNECTION))
-                    || request.getProtocolVersion().equals(HttpVersion.HTTP_1_0)
-                    && !HttpHeaders.Values.KEEP_ALIVE.equalsIgnoreCase(request.headers().get(CONNECTION));
-
-            HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-            HttpHeaders.setContentLength(response, fileLength);
-
-            setContentHeader(response, file);
-
-            if (!close) {
-                response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-            }
-
-            ctx.write(response);
-            System.out.println("读取大小："+fileLength);
-
-            final FileRegion region = new DefaultFileRegion(raf.getChannel(), 0, 1000);
-            ChannelFuture writeFuture = ctx.write(region, ctx.newProgressivePromise());
-            writeFuture.addListener(new ChannelProgressiveFutureListener() {
-                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
-                    if (total < 0) {
-                        System.err.println(future.channel() + " Transfer progress: " + progress);
-                    } else {
-                        System.err.println(future.channel() + " Transfer progress: " + progress + " / " + total);
-                    }
-                }
-
-                public void operationComplete(ChannelProgressiveFuture future) {
-                }
-            });
-
-            ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-            if(close) {
-                raf.close();
-                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-            }
-        }
-
-        private static void setContentHeader(HttpResponse response, File file) {
-            MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-            response.headers().set(CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
-
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
-            dateFormatter.setTimeZone(TimeZone.getTimeZone(HTTP_DATE_GMT_TIMEZONE));
-
-            // Date header
-            Calendar time = new GregorianCalendar();
-            response.headers().set(DATE, dateFormatter.format(time.getTime()));
-
-            // Add cache headers
-            time.add(Calendar.SECOND, HTTP_CACHE_SECONDS);
-            response.headers().set(EXPIRES, dateFormatter.format(time.getTime()));
-            response.headers().set(CACHE_CONTROL, "private, max-age=" + HTTP_CACHE_SECONDS);
-            response.headers().set(LAST_MODIFIED, dateFormatter.format(new Date(file.lastModified())));
         }
 
         private void writeResponse(Channel channel, HttpResponseStatus httpResponseStatus, String returnMsg) {
@@ -279,7 +203,6 @@ public class FileServer{
                 //若该请求响应是最后的响应，则在响应头中没有必要添加'Content-Length'
                 response.headers().set(CONTENT_LENGTH, buf.readableBytes());
             }
-
             //发送请求响应
             ChannelFuture future = channel.writeAndFlush(response);
             //发送请求响应操作结束后关闭连接
@@ -287,19 +210,10 @@ public class FileServer{
                 future.addListener(ChannelFutureListener.CLOSE);
             }
         }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            cause.getCause().printStackTrace();
-            writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR, "数据文件通过过程中出现异常："+cause.getMessage().toString());
-            ctx.channel().close();
-        }
     }
 
     public static void main(String[] args) throws Exception {
         FileServer server = new FileServer();
         server.startServer(8888);
-
     }
 }
-
