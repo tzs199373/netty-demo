@@ -1,4 +1,4 @@
-package file;
+package uploadFile;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -42,7 +42,7 @@ public class UpLoadClient {
             HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
             HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
             HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
-            bodyRequestEncoder.addBodyFileUpload("file", file, contentType, false);
+            bodyRequestEncoder.addBodyFileUpload("uploadFile", file, contentType, false);
             List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
             HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
             HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);
@@ -64,7 +64,7 @@ public class UpLoadClient {
         HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
         HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
         HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
-        bodyRequestEncoder.addBodyFileUpload("file", file, contentType, false);
+        bodyRequestEncoder.addBodyFileUpload("uploadFile", file, contentType, false);
         List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
         HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
         HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);

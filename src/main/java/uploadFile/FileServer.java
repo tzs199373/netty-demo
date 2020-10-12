@@ -1,4 +1,4 @@
-package file;
+package uploadFile;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;

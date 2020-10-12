@@ -20,7 +20,7 @@
 
 LongClient类中main方法会while循环发业务消息，如果屏蔽while循环，client一段时间没有读写事件，就会触发userEventTriggered事件，前提是有IdleStateHandler。该方法中发送ping消息（心跳）。
 
-# file
+# uploadFile
 
 文件传输
 
