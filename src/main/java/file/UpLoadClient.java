@@ -11,40 +11,33 @@ import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.util.CharsetUtil;
 
 import java.io.File;
 import java.util.List;
 
 public class UpLoadClient {
-    private EventLoopGroup group = null;
-    private HttpDataFactory factory = null;
-    private ChannelFuture future = null;
-
-    public UpLoadClient(String host, int port) throws Exception {
-        group = new NioEventLoopGroup();
-        factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
+    public ChannelFuture initClient(String host, int port) throws Exception {
+        EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         b.option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_SNDBUF, 1048576*200)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .group(group).channel(NioSocketChannel.class)
                 .handler(new UpLoadClientIntializer());
-        future = b.connect(host, port).sync();
+        return b.connect(host, port).sync();
     }
 
-    public void uploadFile(String path) {
-        File file = new File(path);
+    public void uploadFile(String uri,File file,Channel channel,String contentType) {
         try {
+            HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
             HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
             HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
-            bodyRequestEncoder.addBodyFileUpload("file", file, "application/x-zip-compressed", false);
+            bodyRequestEncoder.addBodyFileUpload("file", file, contentType, false);
             List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
-            HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, file.getName());
+            HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
             HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);
             bodyRequestEncoder2.setBodyHttpDatas(bodylist);
             bodyRequestEncoder2.finalizeRequest();
-            Channel channel = this.future.channel();
             if(channel.isActive() && channel.isWritable()) {
                 channel.writeAndFlush(request2);
                 if (bodyRequestEncoder2.isChunked()) {
@@ -68,8 +61,9 @@ public class UpLoadClient {
     }
 
     public static void main(String[] args) throws Exception {
-        UpLoadClient client = new UpLoadClient("127.0.0.1",8888);
-        client.uploadFile("C:\\Users\\asus\\Desktop\\image\\meout.jpg");
+        UpLoadClient client = new UpLoadClient();
+        ChannelFuture f = client.initClient("127.0.0.1",8888);
+        client.uploadFile("1.zip",new File("C:\\Users\\asus\\Desktop\\1.zip"),f.channel(),"application/x-zip-compressed");
     }
 }
 
