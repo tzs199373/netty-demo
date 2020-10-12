@@ -28,18 +28,18 @@ public class Client {
                 }
             });
 
-            ChannelFuture f = b.connect("127.0.0.1", 8888).sync();
-            uploadZipFile("/upload",new File("C:\\Users\\asus\\Desktop\\1.zip"),f.channel());
+            ChannelFuture f = b.connect("192.168.0.105", 8888).sync();
+            uploadFile("/upload",new File("C:\\Users\\asus\\Desktop\\image\\1.zip"),f.channel(), "application/x-zip-compressed");
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void uploadZipFile(String uri,File file,Channel channel) throws Exception {
+    private static void uploadFile(String uri,File file,Channel channel,String contentType) throws Exception {
         DefaultFullHttpRequest multipartRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST,uri);
         HttpPostRequestEncoder encoder = new HttpPostRequestEncoder(multipartRequest, true);
         encoder.addBodyAttribute("key1", "value1");
-        encoder.addBodyFileUpload("file",file,"application/x-zip-compressed", false);
+        encoder.addBodyFileUpload("file",file,contentType, false);
         HttpRequest requestToBeSend = encoder.finalizeRequest();
         channel.writeAndFlush(requestToBeSend);
         //发送多个"chunk"，即分段发送多个属性及文件内容
