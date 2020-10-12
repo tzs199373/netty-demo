@@ -25,33 +25,22 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.cookie.CookieHeaderNames.EXPIRES;
 
 public class FileServer{
-
     private EventLoopGroup bossGroup = null;
     private EventLoopGroup workerGroup = null;
 
     private void startServer(int port) throws Exception {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
-
         try {
             ServerBootstrap b = new ServerBootstrap();
-
-            b.group(bossGroup, workerGroup);
-
-            b.option(ChannelOption.TCP_NODELAY, true);
-            b.option(ChannelOption.SO_TIMEOUT, 60000);
-            b.option(ChannelOption.SO_SNDBUF, 1048576*200);
-
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-
-            b.channel(NioServerSocketChannel.class);
-            b.childHandler(new FileServerInitializer());
-
-            // 服务器绑定端口监听
+            b.group(bossGroup, workerGroup)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_TIMEOUT, 60000)
+                    .option(ChannelOption.SO_SNDBUF, 1048576*200)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new FileServerInitializer());
             ChannelFuture f = b.bind(port).sync();
-
-            System.out.println("服务端启动完成...");
-            // 监听服务器关闭监听
             f.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
