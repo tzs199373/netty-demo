@@ -75,20 +75,12 @@ public class FileServer{
     }
 
     private static class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
-
         private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
-
         private String uri = null;
-
         private HttpRequest request = null;
-
         private HttpPostRequestDecoder decoder;
-
         private int num = 0;
-
-        //message、download、upload
         private String type = "message";
-
         public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
         public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
         public static final int HTTP_CACHE_SECONDS = 60;
@@ -102,9 +94,7 @@ public class FileServer{
             System.out.println(num++);//这里可以知道一次文件传输分为多次入站事件
             if (msg instanceof HttpRequest) {
                 request = (HttpRequest) msg;
-
                 uri = sanitizeUri(request.uri());
-
                 if (request.method() == HttpMethod.POST) {
                     if (decoder != null) {
                         decoder.cleanFiles();
@@ -123,7 +113,6 @@ public class FileServer{
 
             if (decoder != null && msg instanceof HttpContent) {
                 HttpContent chunk = (HttpContent) msg;
-
                 try {
                     decoder.offer(chunk);
                 } catch (Exception e) {
@@ -132,9 +121,7 @@ public class FileServer{
                     ctx.channel().close();
                     return;
                 }
-
                 readHttpDataChunkByChunk();
-
                 if (chunk instanceof LastHttpContent) {
                     writeResponse(ctx.channel(), HttpResponseStatus.OK, "");
                     reset();
