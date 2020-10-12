@@ -27,6 +27,16 @@ public class UpLoadClient {
         return b.connect(host, port).sync();
     }
 
+    private class UpLoadClientIntializer extends ChannelInitializer<SocketChannel> {
+        @Override
+        protected void initChannel(SocketChannel ch) throws Exception {
+            ChannelPipeline pipeline = ch.pipeline();
+            pipeline.addLast("decoder", new HttpResponseDecoder());
+            pipeline.addLast("encoder", new HttpRequestEncoder());
+            pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+        }
+    }
+
     public void uploadFile(String uri,File file,Channel channel,String contentType) {
         try {
             HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
@@ -50,21 +60,35 @@ public class UpLoadClient {
         }
     }
 
-    private class UpLoadClientIntializer extends ChannelInitializer<SocketChannel> {
-        @Override
-        protected void initChannel(SocketChannel ch) throws Exception {
-            ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast("decoder", new HttpResponseDecoder());
-            pipeline.addLast("encoder", new HttpRequestEncoder());
-            pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+    private void uploadFile2(String uri,File file,Channel channel,String contentType) throws Exception {
+        HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
+        HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
+        HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
+        bodyRequestEncoder.addBodyFileUpload("file", file, contentType, false);
+        List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
+        HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
+        HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);
+        bodyRequestEncoder2.setBodyHttpDatas(bodylist);
+        bodyRequestEncoder2.finalizeRequest();
+        channel.writeAndFlush(request2);
+        //发送多个"chunk"，即分段发送多个属性及文件内容
+        while (true) {
+            HttpContent chunk = bodyRequestEncoder.readChunk(channel.alloc());
+            if (chunk == null) {
+                break;
+            }
+            channel.writeAndFlush(chunk);
+            if (bodyRequestEncoder instanceof LastHttpContent) {
+                break;
+            }
         }
     }
 
     public static void main(String[] args) throws Exception {
         UpLoadClient client = new UpLoadClient();
         ChannelFuture f = client.initClient("192.168.0.105",8888);
-//        client.uploadFile("1.zip",new File("C:\\Users\\asus\\Desktop\\image\\1.zip"),f.channel(),"application/x-zip-compressed");
-        client.uploadFile("meout.jpg",new File("C:\\Users\\asus\\Desktop\\image\\meout.jpg"),f.channel(),HttpHeaderValues.APPLICATION_OCTET_STREAM.toString());
+        client.uploadFile("1.zip",new File("C:\\Users\\asus\\Desktop\\image\\1.zip"),f.channel(),"application/x-zip-compressed");
+//        client.uploadFile("meout.jpg",new File("C:\\Users\\asus\\Desktop\\image\\meout.jpg"),f.channel(),HttpHeaderValues.APPLICATION_OCTET_STREAM.toString());
 
     }
 }
