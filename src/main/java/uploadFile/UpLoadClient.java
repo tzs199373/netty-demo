@@ -11,9 +11,12 @@ import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UpLoadClient {
     public ChannelFuture initClient(String host, int port) throws Exception {
@@ -57,30 +60,6 @@ public class UpLoadClient {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void uploadFile2(String uri,File file,Channel channel,String contentType) throws Exception {
-        HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
-        HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
-        HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
-        bodyRequestEncoder.addBodyFileUpload("uploadFile", file, contentType, false);
-        List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
-        HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
-        HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);
-        bodyRequestEncoder2.setBodyHttpDatas(bodylist);
-        bodyRequestEncoder2.finalizeRequest();
-        channel.writeAndFlush(request2);
-        //发送多个"chunk"，即分段发送多个属性及文件内容
-        while (true) {
-            HttpContent chunk = bodyRequestEncoder.readChunk(channel.alloc());
-            if (chunk == null) {
-                break;
-            }
-            channel.writeAndFlush(chunk);
-            if (bodyRequestEncoder instanceof LastHttpContent) {
-                break;
-            }
         }
     }
 
