@@ -81,7 +81,6 @@ public class Example {
 
         /*******************************ºÏ²¢****************************************/
         String rst = head.append(body).toString();
-        System.out.println(rst);
         return rst;
     }
 
