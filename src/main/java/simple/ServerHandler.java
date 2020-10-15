@@ -28,7 +28,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             byte[] bytes = (byte[])msg;
             System.out.println(new String(bytes));
 
-            String returnMsg = "hi , Im is server...";
+            String returnMsg = "hi , I am is server...";
             Channel channel = ctx.channel();
             channel.writeAndFlush(returnMsg.getBytes());
         } finally {
