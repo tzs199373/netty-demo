@@ -102,7 +102,7 @@ public class MultipartDataUtil {
 
             byte[] fileByte = Files.readAllBytes(filePart.getFile().toPath());
             channel.write(fileByte);
-            String fileStr = new String(fileByte, StandardCharsets.US_ASCII.name());
+            String fileStr = "文件字节省略";
 
             byte[] endByte = filePart.getEnd().getBytes();
             channel.write(endByte);
