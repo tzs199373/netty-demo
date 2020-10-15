@@ -56,13 +56,13 @@ public class Example2 {
         StringBuilder head = new StringBuilder(HttpMethod.POST.toString())
                 .append(" ").append(uri).append(" ").append(HttpVersion.HTTP_1_1.toString()).append("\r\n");
         //Ê×²¿×Ö¶Î
-        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
-        head.append("Accept: */*").append("\r\n");
-        head.append("Cache-Control: no-cache").append("\r\n");
-        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
+//        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
+//        head.append("Accept: */*").append("\r\n");
+//        head.append("Cache-Control: no-cache").append("\r\n");
+//        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
         head.append("Host: 192.168.0.105:8080").append("\r\n");
-        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
-        head.append("Connection: keep-alive").append("\r\n");
+//        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
+//        head.append("Connection: keep-alive").append("\r\n");
         head.append("Content-Type: multipart/form-data; boundary=").append(BOUNDARY).append("\r\n");
         head.append("Content-Length: ").append(String.valueOf(contentLength)).append("\r\n");
         head.append("\r\n");
