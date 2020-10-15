@@ -26,8 +26,73 @@ LongClient类中main方法会while循环发业务消息，如果屏蔽while循�
 
 # uploadFile
 
-文件传输，由于netty对文件传输都是封装的分块传输，即http chunk，笔者能力有限没找到netty有关multipart/form-data的协议，
-这里笔者纯手写一个multipart/form-data报文
+文件传输，由于netty对文件传输都是封装的分块传输，即http chunk，笔者能力有限没找到netty有关multipart/form-data的协议，这里笔者纯手写一个multipart/form-data报文。
+
+服务端用的是之前springboot接收文件上传的接口
+
+```java
+package com.web.controller;
+
+import com.commonutils.util.json.JSONObject;
+import com.commonutils.util.validate.FileTypeCensor;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URLEncoder;
+
+@Controller
+@RequestMapping(value = "/file")
+public class FileController {
+    @ResponseBody
+    @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    
+    public String uploadFile(@RequestParam(value = "uploadFile", required = false) MultipartFile[] multipartFiles,HttpServletRequest request){
+        JSONObject result = new JSONObject();
+        try {
+            for (int i=0; i< multipartFiles.length; i++){
+                // 输出源文件名称 就是指上传前的文件名称
+                System.out.println("uploadFile:" + multipartFiles[i].getOriginalFilename());
+                // 创建文件(MultipartFile转File)
+                String saveRoot = "f:\\";
+                File file = new File(saveRoot + multipartFiles[i].getOriginalFilename());
+                InputStream in  = multipartFiles[i].getInputStream();
+                OutputStream os = new FileOutputStream(file);
+                byte[] buffer = new byte[4096];
+                int n;
+                while ((n = in.read(buffer,0,4096)) != -1){
+                    os.write(buffer,0,n);
+                }
+                in.close();
+                os.close();
+            }
+            //输出其他字段
+            String value = request.getParameter("k1");
+            System.out.println("value:"+value);
+        } catch (Exception e) {
+            result.put("msg", e.getMessage());
+            result.put("flag", "fail");
+        }
+        result.put("flag", "success");
+        result.put("msg", "success");
+
+        return result.toString();
+    }
+
+   
+}
+
+
+```
+
+
 
 # packetProblem
 
@@ -38,6 +103,7 @@ LongClient类中main方法会while循环发业务消息，如果屏蔽while循�
 首先启动服务端，然后再启动客户端，通过控制台可以看到，发送较大字符串，服务接收的数据分成了2次,这就是我们要解决的问题。
 
 ## @Sharable
+
 netty的ChannelHandler如果带有@Sharable表示多个channel可以共用一个，否则不行，很多解码器里因为存有Channel的状态变量，所以很多不带@Sharable
 
 ## LineBasedFrameDecoder
@@ -85,7 +151,6 @@ lengthAdjustment：长度字段的补偿值
 initialBytesToStrip ：从解码帧中第一次去除的字节数。
 通俗地说netty拿到一个完整的数据包之后向业务解码器传递之前，应该跳过多少字节。
 常用于业务解析器中不需要消息的头部（包含长度或其他信息）的场景
-
 
 failFast：true: 读取到长度域超过maxFrameLength，就抛出一个 TooLongFrameException。
 false: 只有真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException。
