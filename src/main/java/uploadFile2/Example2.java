@@ -30,18 +30,17 @@ public class Example2 {
 
 
     public static void buildMultipartData(Channel channel, String uri, File file) throws IOException {
-//        String charst = StandardCharsets.US_ASCII.name();
 
         /*******************************报文主体****************************************/
 
         StringBuilder body = new StringBuilder();
-        String BOUNDARY = "----WebKitFormBoundaryuglFmr6f0V9ea3xG"; // 分隔符
+        String BOUNDARY = "--------------------------328804715201393196989403"; // 分隔符
         //文件
         body.append("--")
                 .append(BOUNDARY)
                 .append("\r\n")
                 .append("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"1.zip\"\r\n")
-                .append("Content-Type: application/x-zip-compressed\r\n\r\n");
+                .append("Content-Type: application/zip\r\n\r\n");
 
         //文件内容：二进制
 
@@ -57,8 +56,15 @@ public class Example2 {
         StringBuilder head = new StringBuilder(HttpMethod.POST.toString())
                 .append(" ").append(uri).append(" ").append(HttpVersion.HTTP_1_1.toString()).append("\r\n");
         //首部字段
-        head.append("Content-Length: ").append(String.valueOf(contentLength)).append("\r\n");
+        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
+        head.append("Accept: */*").append("\r\n");
+        head.append("Cache-Control: no-cache").append("\r\n");
+        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
+        head.append("Host: 192.168.0.105:8080").append("\r\n");
+        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
+        head.append("Connection: keep-alive").append("\r\n");
         head.append("Content-Type: multipart/form-data; boundary=").append(BOUNDARY).append("\r\n");
+        head.append("Content-Length: ").append(String.valueOf(contentLength)).append("\r\n");
         head.append("\r\n");
 
         /*******************************合并****************************************/
@@ -66,6 +72,7 @@ public class Example2 {
         channel.write(body.toString().getBytes());
         channel.write(Files.readAllBytes(file.toPath()));
         channel.write(bodyEnd.toString().getBytes());
+        System.out.println(head.append(body).append(bodyEnd).toString());
         channel.flush();
     }
 
