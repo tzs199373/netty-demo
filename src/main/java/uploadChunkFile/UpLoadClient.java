@@ -1,4 +1,4 @@
-package uploadFile;
+package uploadChunkFile;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -11,12 +11,9 @@ import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class UpLoadClient {
     public ChannelFuture initClient(String host, int port) throws Exception {
@@ -45,12 +42,16 @@ public class UpLoadClient {
             HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
             HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
             HttpPostRequestEncoder bodyRequestEncoder = new HttpPostRequestEncoder(factory, request, false);
-            bodyRequestEncoder.addBodyFileUpload("uploadFile", file, contentType, false);
+            bodyRequestEncoder.addBodyFileUpload("uploadChunkFile", file, contentType, false);
             List<InterfaceHttpData> bodylist = bodyRequestEncoder.getBodyListAttributes();
+
+
             HttpRequest request2 = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
+
             HttpPostRequestEncoder bodyRequestEncoder2 = new HttpPostRequestEncoder(factory, request2, true);
             bodyRequestEncoder2.setBodyHttpDatas(bodylist);
             bodyRequestEncoder2.finalizeRequest();
+
             if(channel.isActive() && channel.isWritable()) {
                 channel.writeAndFlush(request2);
                 if (bodyRequestEncoder2.isChunked()) {

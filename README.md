@@ -20,9 +20,14 @@
 
 LongClient类中main方法会while循环发业务消息，如果屏蔽while循环，client一段时间没有读写事件，就会触发userEventTriggered事件，前提是有IdleStateHandler。该方法中发送ping消息（心跳）。
 
+# uploadChunkFile
+
+文件分块传输
+
 # uploadFile
 
-文件传输
+文件传输，由于netty对文件传输都是封装的分块传输，即http chunk，笔者能力有限没找到netty有关multipart/form-data的协议，
+这里笔者纯手写一个multipart/form-data报文
 
 # packetProblem
 
