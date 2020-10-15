@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class Example {
 
         FilePart filePart = new FilePart("uploadFile","1.zip",
                 "application/x-gzip-compressed",new File("C:\\Users\\asus\\Desktop\\1.zip"));
-        FilePart filePart2 = new FilePart("uploadFile","1.jpg",
+        FilePart filePart2 = new FilePart("uploadFile2","1.jpg",
                 "image/jpg",new File("C:\\Users\\asus\\Desktop\\1.jpg"));
         ArrayList<FilePart> fileParts = new ArrayList<FilePart>(){{
             add(filePart);
@@ -46,7 +47,7 @@ public class Example {
                     .append(BOUNDARY)
                     .append("\r\n")
                     .append("Content-Disposition: form-data; name=\""+ entry.getKey() + "\"\r\n\r\n")
-                    .append(entry.getValue())
+                    .append(URLEncoder.encode(entry.getValue()))
                     .append("\r\n");
         }
         //¶àÎÄ¼þ
