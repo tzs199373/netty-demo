@@ -36,7 +36,7 @@ public class Client {
                      });
                  }
              });
-            ChannelFuture f = b.connect("192.168.137.67", 8081).sync();
+            ChannelFuture f = b.connect("192.168.0.105", 8080).sync();
             f.channel().closeFuture().sync();
         } catch (Exception e){
             e.printStackTrace();
