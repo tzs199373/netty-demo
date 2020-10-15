@@ -40,7 +40,7 @@ public class Example2 {
                 .append(BOUNDARY)
                 .append("\r\n")
                 .append("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"1.zip\"\r\n")
-                .append("Content-Type: application/zip\r\n\r\n");
+                .append("Content-Type: application/x-gzip-compressed\r\n\r\n");
 
         //文件内容：二进制
 
@@ -53,8 +53,7 @@ public class Example2 {
 
         /*******************************报文首部****************************************/
         //请求行
-        StringBuilder head = new StringBuilder(HttpMethod.POST.toString())
-                .append(" ").append(uri).append(" ").append(HttpVersion.HTTP_1_1.toString()).append("\r\n");
+        StringBuilder head = new StringBuilder("POST ").append(uri).append(" HTTP/1.1").append("\r\n");
         //首部字段
 //        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
 //        head.append("Accept: */*").append("\r\n");
