@@ -1,87 +1,122 @@
 package uploadFile;
 
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.channel.Channel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author tzs
- * @version 1.0
- * @Description
- * @since 2020/10/15 9:00
- */
 public class Example {
-    public static void main(String[] args) throws IOException {
-        getMultipartData();
-    }
 
-
-    public static String getMultipartData() throws IOException {
+    public static void getMultipartData(Channel channel) throws IOException {
 //        String uri = "/LAPI/V1.0/PACS/GUI/PicFile?Type=2";
         String uri = "/file/upload";
-        String host = "192.168.2.215";
 
-        File[] files = new File[1];
-        File file = new File("C:\\Users\\asus\\Desktop\\1.zip");
-        files[0] = file;
-        return buildMultipartData(host,uri,files);
+
+        Map<String,String> fliedMap  = new HashMap<>();
+        fliedMap.put("k1","v1");
+        fliedMap.put("k2","汉字");
+
+        FilePart filePart = new FilePart("uploadFile","1.zip",
+                "application/x-gzip-compressed",new File("C:\\Users\\asus\\Desktop\\1.zip"));
+        FilePart filePart2 = new FilePart("uploadFile","1.jpg",
+                "image/jpg",new File("C:\\Users\\asus\\Desktop\\1.jpg"));
+        ArrayList<FilePart> fileParts = new ArrayList<FilePart>(){{
+            add(filePart);
+            add(filePart2);
+        }};
+
+        buildMultipartData(channel,uri,fliedMap,fileParts);
     }
 
 
-    public static String buildMultipartData(String host,String uri,File[] files) throws IOException {
-        File file = files[0];
-        byte[] fileByte = Files.readAllBytes(file.toPath());
+    public static void buildMultipartData(Channel channel, String uri,Map<String,String> fliedMap,ArrayList<FilePart> fileParts) throws IOException {
+        String BOUNDARY = "--------------------------328804715201393196989403"; // 分隔符
+
 
         /*******************************报文主体****************************************/
-        StringBuilder body = new StringBuilder();
-        String BOUNDARY = "---------------------------azhHvtQvhg8ujJ"; // 分隔符
-        Map<String,String> fliedMap  = new HashMap<>();
-//        fliedMap.put("k1","v1");
-//        fliedMap.put("k2","v2");
-
-        //每个字段
+        //多字段
+        StringBuilder paramterPart = new StringBuilder();
         for (Map.Entry<String, String> entry : fliedMap.entrySet()) {
-            body.append("--")
+            paramterPart.append("--")
                     .append(BOUNDARY)
                     .append("\r\n")
                     .append("Content-Disposition: form-data; name=\""+ entry.getKey() + "\"\r\n\r\n")
-                    .append(URLEncoder.encode(entry.getValue(),"UTF-8"))
+                    .append(entry.getValue())
                     .append("\r\n");
         }
-
-        //文件
-        for (int i = 0; i < files.length; i++) {
-            body.append("--")
+        //多文件
+        long fileTotalSize = 0;
+        for (FilePart filePart:fileParts) {
+            StringBuilder prev = new StringBuilder()
+                    .append("--")
                     .append(BOUNDARY)
                     .append("\r\n")
-                    .append("Content-Disposition: form-data; name=\"uploadFile\"; filename=\"1_1.zip\"\r\n")
-                    .append("Content-Type: application/x-gzip-compressed\r\n\r\n")
-                    .append(new String(fileByte));
+                    .append("Content-Disposition: form-data; name=\""+filePart.getName()+"\"; filename=\""+filePart.getFileName()+"\"\r\n")
+                    .append("Content-Type: " + filePart.getContentType() +"\r\n\r\n");
+            String end = "\r\n";
+            filePart.setPrev(prev);
+            filePart.setEnd(end);
+            fileTotalSize += prev.toString().getBytes().length + filePart.getFileSize() + end.getBytes().length;
         }
         //结束标志
-        body.append("\r\n--" + BOUNDARY + "--\r\n");
+        StringBuilder bodyEnd = new StringBuilder("--").append(BOUNDARY).append("--\r\n");
 
+        //报文主体长度
+        long contentLength = paramterPart.toString().getBytes().length
+                + fileTotalSize + bodyEnd.toString().getBytes().length;
 
         /*******************************报文首部****************************************/
         //请求行
-        StringBuilder head = new StringBuilder(HttpMethod.POST.toString())
-                .append(" ").append(uri).append(" ").append(HttpVersion.HTTP_1_1.toString()).append("\r\n");
+        StringBuilder head = new StringBuilder("POST ").append(uri).append(" HTTP/1.1").append("\r\n");
         //首部字段
-        head.append("Host: ").append(host).append("\r\n");//服务端IP
-        head.append("Content-Length: ").append(String.valueOf(body.toString().getBytes().length)).append("\r\n");
+//        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
+//        head.append("Accept: */*").append("\r\n");
+//        head.append("Cache-Control: no-cache").append("\r\n");
+//        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
+        head.append("Host: 192.168.0.105:8080").append("\r\n");
+//        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
+//        head.append("Connection: keep-alive").append("\r\n");
         head.append("Content-Type: multipart/form-data; boundary=").append(BOUNDARY).append("\r\n");
+        head.append("Content-Length: ").append(String.valueOf(contentLength)).append("\r\n");
         head.append("\r\n");
 
-        /*******************************合并****************************************/
-        String rst = head.append(body).toString();
-        return rst;
+        /*******************************发送与打印****************************************/
+        byte[] headByte = head.toString().getBytes();
+        channel.write(headByte);
+        String headStr = new String(headByte);
+
+        byte[] paramterPartByte = paramterPart.toString().getBytes();
+        channel.write(paramterPartByte);
+        String paramterPartStr = new String(paramterPartByte);
+
+        String fileString = "";
+        for (FilePart filePart:fileParts) {
+            byte[] prevByte = filePart.getPrev().toString().getBytes();
+            channel.write(prevByte);
+            String prevStr = new String(prevByte);
+
+            byte[] fileByte = Files.readAllBytes(filePart.getFile().toPath());
+            channel.write(fileByte);
+            String fileStr = new String(fileByte, StandardCharsets.US_ASCII.name());
+
+            byte[] endByte = filePart.getEnd().getBytes();
+            channel.write(endByte);
+            String endStr = new String(endByte);
+
+            fileString += prevStr+fileStr+endStr;
+        }
+
+        byte[] bodyEndByte = bodyEnd.toString().getBytes();
+        channel.write(bodyEndByte);
+        String bodyEndStr = new String(bodyEndByte);
+
+        System.out.println(headStr+paramterPartStr+fileString+bodyEndStr);
+        channel.flush();
     }
 
 

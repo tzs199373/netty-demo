@@ -5,11 +5,13 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 import java.io.IOException;
 
 import static uploadFile.Example.getMultipartData;
+
 
 public class Client {
 
@@ -23,6 +25,7 @@ public class Client {
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
+                     ch.pipeline().addLast(new ByteArrayEncoder());
                      ch.pipeline().addLast(new StringEncoder());
                      ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                          @Override
@@ -31,7 +34,7 @@ public class Client {
                          }
                          @Override
                          public void channelActive(ChannelHandlerContext ctx) throws IOException {
-                             ctx.channel().writeAndFlush(getMultipartData());
+                             getMultipartData(ctx.channel());
                          }
                      });
                  }
