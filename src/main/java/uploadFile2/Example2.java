@@ -57,7 +57,7 @@ public class Example2 {
         StringBuilder head = new StringBuilder(HttpMethod.POST.toString())
                 .append(" ").append(uri).append(" ").append(HttpVersion.HTTP_1_1.toString()).append("\r\n");
         //Ê×²¿×Ö¶Î
-        head.append("Content-Length: ").append(contentLength).append("\r\n");
+        head.append("Content-Length: ").append(String.valueOf(contentLength)).append("\r\n");
         head.append("Content-Type: multipart/form-data; boundary=").append(BOUNDARY).append("\r\n");
         head.append("\r\n");
 
