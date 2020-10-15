@@ -11,12 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Example {
+public class MultipartDataUtil {
 
-    public static void getMultipartData(Channel channel) throws IOException {
+    public static void postMultipartData(Channel channel) throws IOException {
 //        String uri = "/LAPI/V1.0/PACS/GUI/PicFile?Type=2";
         String uri = "/file/upload";
-
 
         Map<String,String> fliedMap  = new HashMap<>();
         fliedMap.put("k1","v1");
@@ -31,11 +30,11 @@ public class Example {
             add(filePart2);
         }};
 
-        buildMultipartData(channel,uri,fliedMap,fileParts);
+        postMultipartData(channel,uri,fliedMap,fileParts);
     }
 
 
-    public static void buildMultipartData(Channel channel, String uri,Map<String,String> fliedMap,ArrayList<FilePart> fileParts) throws IOException {
+    public static void postMultipartData(Channel channel, String uri,Map<String,String> fliedMap,ArrayList<FilePart> fileParts) throws IOException {
         String BOUNDARY = "--------------------------328804715201393196989403"; // ·Ö¸ô·û
 
 

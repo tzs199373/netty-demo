@@ -10,11 +10,8 @@ import io.netty.handler.codec.string.StringEncoder;
 
 import java.io.IOException;
 
-import static uploadFile.Example.getMultipartData;
-
 
 public class Client {
-
     public static void main(String[] args) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -34,7 +31,7 @@ public class Client {
                          }
                          @Override
                          public void channelActive(ChannelHandlerContext ctx) throws IOException {
-                             getMultipartData(ctx.channel());
+                             MultipartDataUtil.postMultipartData(ctx.channel());
                          }
                      });
                  }
@@ -47,7 +44,5 @@ public class Client {
             group.shutdownGracefully();
         }
     }
-
-
 }
 
