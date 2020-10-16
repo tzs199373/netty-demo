@@ -6,12 +6,21 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
+import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import unv.HttpDecoder;
+import unv.HttpEncoder;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class Client {
+    private static final int READ_TIME_OUT = 120;
+
+
     public static void main(String[] args) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -22,8 +31,13 @@ public class Client {
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
+//                     ch.pipeline().addLast(new IdleStateHandler(READ_TIME_OUT, READ_TIME_OUT, READ_TIME_OUT, TimeUnit.SECONDS));
                      ch.pipeline().addLast(new ByteArrayEncoder());
-                     ch.pipeline().addLast(new StringEncoder());
+//                     ch.pipeline().addLast(new HttpDecoder());
+//                     ch.pipeline().addLast(new HttpEncoder());
+//                     ch.pipeline().addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
+//                     ch.pipeline().addLast(new ReadTimeoutHandler(READ_TIME_OUT));
+
                      ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                          @Override
                          public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -36,7 +50,7 @@ public class Client {
                      });
                  }
              });
-            ChannelFuture f = b.connect("192.168.0.105", 8080).sync();
+            ChannelFuture f = b.connect("192.168.137.67", 8081).sync();
             f.channel().closeFuture().sync();
         } catch (Exception e){
             e.printStackTrace();

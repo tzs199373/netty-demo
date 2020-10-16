@@ -1,9 +1,11 @@
 package uploadFile;
 
 import io.netty.channel.Channel;
+import io.netty.channel.socket.SocketChannel;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,9 +37,12 @@ public class MultipartDataUtil {
 
 
     public static void postMultipartData(Channel channel, String uri,Map<String,String> fliedMap,ArrayList<FilePart> fileParts) throws IOException {
-        String BOUNDARY = "--------------------------328804715201393196989403"; // 分隔符
-
-
+        // 分隔符
+        String BOUNDARY = "--------------------------328804715201393196989403";
+        // 远程ip与port
+        InetSocketAddress ipSocket = ((SocketChannel)channel).remoteAddress();
+        String  remoteAddress = ipSocket.getAddress().getHostAddress();
+        int remotePort = ipSocket.getPort();
         /*******************************报文主体****************************************/
         //多字段
         StringBuilder paramterPart = new StringBuilder();
@@ -78,7 +83,7 @@ public class MultipartDataUtil {
 //        head.append("Accept: */*").append("\r\n");
 //        head.append("Cache-Control: no-cache").append("\r\n");
 //        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
-        head.append("Host: 192.168.0.105:8080").append("\r\n");
+        head.append("Host: ").append(remoteAddress).append(":").append(remotePort).append("\r\n");
 //        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
 //        head.append("Connection: keep-alive").append("\r\n");
         head.append("Content-Type: multipart/form-data; boundary=").append(BOUNDARY).append("\r\n");
