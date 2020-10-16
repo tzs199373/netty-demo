@@ -31,12 +31,12 @@ public class Client {
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
-//                     ch.pipeline().addLast(new IdleStateHandler(READ_TIME_OUT, READ_TIME_OUT, READ_TIME_OUT, TimeUnit.SECONDS));
+                     ch.pipeline().addLast(new IdleStateHandler(READ_TIME_OUT, READ_TIME_OUT, READ_TIME_OUT, TimeUnit.SECONDS));
                      ch.pipeline().addLast(new ByteArrayEncoder());
 //                     ch.pipeline().addLast(new HttpDecoder());
 //                     ch.pipeline().addLast(new HttpEncoder());
 //                     ch.pipeline().addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
-//                     ch.pipeline().addLast(new ReadTimeoutHandler(READ_TIME_OUT));
+                     ch.pipeline().addLast(new ReadTimeoutHandler(READ_TIME_OUT));
 
                      ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                          @Override
