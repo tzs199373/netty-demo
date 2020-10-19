@@ -28,11 +28,15 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
             switch (e.state()) {
                 case WRITER_IDLE:
                     Attribute<ClientInfo> attr = ctx.channel().attr(CLIENT_INFO_ATTRIBUTE_KEY);
-                    
-                    PingMsg pingMsg=new PingMsg();
-                    pingMsg.setClientId(attr.get().getClientId());
-                    ctx.writeAndFlush(pingMsg);
-                    System.out.println("send ping to server----------");
+                    if(attr.get().isOpenHeartBeat()){
+                        PingMsg pingMsg=new PingMsg();
+                        pingMsg.setClientId(attr.get().getClientId());
+                        ctx.writeAndFlush(pingMsg);
+                        System.out.println("send ping to server----------");
+                    }else{
+                        System.out.println("client["+attr.get().getClientId()+"] beatHeart is not open");
+                        ctx.fireUserEventTriggered(evt);
+                    }
                     break;
                 case READER_IDLE:
                     break;
