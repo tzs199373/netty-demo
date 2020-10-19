@@ -52,6 +52,16 @@ public class LongClient {
             public void operationComplete(ChannelFuture futureListener) throws Exception {
                 if (futureListener.isSuccess()) {
                     System.out.println("client["+clientId+"] connect server  成功---------");
+                    SocketChannel socketChannel = (SocketChannel)futureListener.channel();
+                    //将客户端ID绑定至Channel
+                    Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
+                    attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
+                    //登陆请求
+                    LoginMsg loginMsg=new LoginMsg();
+                    loginMsg.setClientId(clientId);
+                    loginMsg.setPassword("yao");
+                    loginMsg.setUserName("robin");
+                    socketChannel.writeAndFlush(loginMsg);
                 } else {
                     System.out.println("Failed to connect to server, try connect after 10s");
 
@@ -69,19 +79,18 @@ public class LongClient {
             }
         });
 
-        if (future.isSuccess()) {
-            SocketChannel socketChannel = (SocketChannel)future.channel();
-//            System.out.println("client["+clientId+"] connect server  成功---------");
-            //将客户端ID绑定至Channel
-            Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
-            attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
-            //登陆请求
-            LoginMsg loginMsg=new LoginMsg();
-            loginMsg.setClientId(clientId);
-            loginMsg.setPassword("yao");
-            loginMsg.setUserName("robin");
-            socketChannel.writeAndFlush(loginMsg);
-        }
+//        if (future.isSuccess()) {
+//            SocketChannel socketChannel = (SocketChannel)future.channel();
+//            //将客户端ID绑定至Channel
+//            Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
+//            attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
+//            //登陆请求
+//            LoginMsg loginMsg=new LoginMsg();
+//            loginMsg.setClientId(clientId);
+//            loginMsg.setPassword("yao");
+//            loginMsg.setUserName("robin");
+//            socketChannel.writeAndFlush(loginMsg);
+//        }
     }
 
     public static void main(String[]args) throws InterruptedException {
