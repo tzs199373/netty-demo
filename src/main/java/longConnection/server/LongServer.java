@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import longConnection.share.module.AskMsg;
 
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,6 @@ public class LongServer {
     private int port;
     public LongServer(int port) throws InterruptedException {
         this.port = port;
-        bind();
     }
 
     private void bind() throws InterruptedException {
@@ -32,6 +32,7 @@ public class LongServer {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
                 ChannelPipeline p = socketChannel.pipeline();
+                p.addLast(new ReadTimeoutHandler(10));
                 p.addLast(new ObjectEncoder());
                 p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
                 p.addLast(new NettyServerHandler());
@@ -43,6 +44,6 @@ public class LongServer {
         }
     }
     public static void main(String []args) throws InterruptedException {
-        new LongServer(9999);
+        new LongServer(9999).bind();
     }
 }

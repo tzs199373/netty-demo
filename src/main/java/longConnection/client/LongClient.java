@@ -22,13 +22,12 @@ public class LongClient {
     private int port;
     private String host;
 
-    public LongClient(int port, String host,String clientId) throws InterruptedException {
+    public LongClient(int port, String host) throws InterruptedException {
         this.port = port;
         this.host = host;
-        start(clientId);
     }
 
-    private void start(String clientId) throws InterruptedException {
+    private void start(String clientId,boolean isOpenHeartBeat) throws InterruptedException {
         EventLoopGroup eventLoopGroup=new NioEventLoopGroup();
         Bootstrap bootstrap=new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
@@ -47,13 +46,13 @@ public class LongClient {
         ChannelFuture future =bootstrap.connect(host,port).sync();
         if (future.isSuccess()) {
             SocketChannel socketChannel = (SocketChannel)future.channel();
-            System.out.println("connect server  成功---------");
+            System.out.println("client["+clientId+"] connect server  成功---------");
             //将客户端ID绑定至Channel
             Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
-            attr.setIfAbsent(new ClientInfo(clientId,new Date()));
+            attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
         }
     }
     public static void main(String[]args) throws InterruptedException {
-        new LongClient(9999,"localhost","clientId001");
+        new LongClient(9999,"localhost").start("clientId001",true);
     }
 }
