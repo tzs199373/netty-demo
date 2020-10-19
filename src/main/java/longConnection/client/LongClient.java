@@ -55,15 +55,5 @@ public class LongClient {
     }
     public static void main(String[]args) throws InterruptedException {
         new LongClient(9999,"localhost","clientId001");
-
-        //屏蔽while循环（没有其他读写事件）就会触发心跳
-//        while (true){
-//            TimeUnit.SECONDS.sleep(3);
-//            AskMsg askMsg=new AskMsg();
-//            AskParams askParams=new AskParams();
-//            askParams.setAuth("authToken");
-//            askMsg.setParams(askParams);
-//            client.socketChannel.writeAndFlush(askMsg);
-//        }
     }
 }
