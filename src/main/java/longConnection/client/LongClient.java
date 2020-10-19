@@ -13,6 +13,7 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.Attribute;
+import longConnection.share.module.LoginMsg;
 
 import java.util.Date;
 
@@ -50,6 +51,13 @@ public class LongClient {
             //将客户端ID绑定至Channel
             Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
             attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
+
+
+            LoginMsg loginMsg=new LoginMsg();
+            loginMsg.setClientId(clientId);
+            loginMsg.setPassword("yao");
+            loginMsg.setUserName("robin");
+            socketChannel.writeAndFlush(loginMsg);
         }
     }
     public static void main(String[]args) throws InterruptedException {

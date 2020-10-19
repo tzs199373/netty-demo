@@ -11,17 +11,6 @@ import static longConnection.client.Constants.CLIENT_INFO_ATTRIBUTE_KEY;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Attribute<ClientInfo> attr = ctx.channel().attr(CLIENT_INFO_ATTRIBUTE_KEY);
-
-        LoginMsg loginMsg=new LoginMsg();
-        loginMsg.setClientId(attr.get().getClientId());
-        loginMsg.setPassword("yao");
-        loginMsg.setUserName("robin");
-        ctx.channel().writeAndFlush(loginMsg);
-    }
-
-    @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent e = (IdleStateEvent) evt;
