@@ -20,6 +20,7 @@ import static longConnection.client.Constants.CLIENT_INFO_ATTRIBUTE_KEY;
 public class LongClient {
     private int port;
     private String host;
+    private Bootstrap bootstrap;
 
     public LongClient(int port, String host) throws InterruptedException {
         this.port = port;
@@ -27,8 +28,9 @@ public class LongClient {
     }
 
     private void start(String clientId,boolean isOpenHeartBeat) throws InterruptedException {
+        LongClient longClient = this;
         EventLoopGroup eventLoopGroup=new NioEventLoopGroup();
-        Bootstrap bootstrap=new Bootstrap();
+        bootstrap=new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.option(ChannelOption.SO_KEEPALIVE,true);
         bootstrap.group(eventLoopGroup);
@@ -39,13 +41,13 @@ public class LongClient {
                 socketChannel.pipeline().addLast(new IdleStateHandler(20,10,0));
                 socketChannel.pipeline().addLast(new ObjectEncoder());
                 socketChannel.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                socketChannel.pipeline().addLast(new NettyClientHandler());
+                socketChannel.pipeline().addLast(new NettyClientHandler(longClient));
             }
         });
-        doConnect(bootstrap,clientId,isOpenHeartBeat);
+        doConnect(clientId,isOpenHeartBeat);
     }
 
-    private void doConnect(Bootstrap bootstrap,String clientId,boolean isOpenHeartBeat) throws InterruptedException {
+    protected void doConnect(String clientId,boolean isOpenHeartBeat) throws InterruptedException {
         ChannelFuture future = bootstrap.connect(host,port).sync();
 
         future.addListener(new ChannelFutureListener() {
@@ -69,7 +71,7 @@ public class LongClient {
                         @Override
                         public void run() {
                             try {
-                                doConnect(bootstrap,clientId,isOpenHeartBeat);
+                                doConnect(clientId,isOpenHeartBeat);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -78,22 +80,9 @@ public class LongClient {
                 }
             }
         });
-
-//        if (future.isSuccess()) {
-//            SocketChannel socketChannel = (SocketChannel)future.channel();
-//            //将客户端ID绑定至Channel
-//            Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
-//            attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
-//            //登陆请求
-//            LoginMsg loginMsg=new LoginMsg();
-//            loginMsg.setClientId(clientId);
-//            loginMsg.setPassword("yao");
-//            loginMsg.setUserName("robin");
-//            socketChannel.writeAndFlush(loginMsg);
-//        }
     }
 
     public static void main(String[]args) throws InterruptedException {
-        new LongClient(9999,"localhost").start("clientId001",true);
+        new LongClient(9999,"localhost").start("clientId001",false);
     }
 }
