@@ -12,23 +12,23 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import io.netty.util.concurrent.EventExecutorGroup;
-import longConnection.share.module.*;
+import io.netty.util.Attribute;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
+
+import static longConnection.client.Constants.CLIENT_INFO_ATTRIBUTE_KEY;
 
 public class LongClient {
     private int port;
     private String host;
-    private SocketChannel socketChannel;
-    private static final EventExecutorGroup group = new DefaultEventExecutorGroup(20);
-    public LongClient(int port, String host) throws InterruptedException {
+
+    public LongClient(int port, String host,String clientId) throws InterruptedException {
         this.port = port;
         this.host = host;
-        start();
+        start(clientId);
     }
-    private void start() throws InterruptedException {
+
+    private void start(String clientId) throws InterruptedException {
         EventLoopGroup eventLoopGroup=new NioEventLoopGroup();
         Bootstrap bootstrap=new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
@@ -46,18 +46,15 @@ public class LongClient {
         });
         ChannelFuture future =bootstrap.connect(host,port).sync();
         if (future.isSuccess()) {
-            socketChannel = (SocketChannel)future.channel();
+            SocketChannel socketChannel = (SocketChannel)future.channel();
             System.out.println("connect server  成功---------");
+            //将客户端ID绑定至Channel
+            Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
+            attr.setIfAbsent(new ClientInfo(clientId,new Date()));
         }
     }
     public static void main(String[]args) throws InterruptedException {
-        LongClient client =new LongClient(9999,"localhost");
-
-        LoginMsg loginMsg=new LoginMsg();
-        loginMsg.setClientId("clientId001");
-        loginMsg.setPassword("yao");
-        loginMsg.setUserName("robin");
-        client.socketChannel.writeAndFlush(loginMsg);
+        new LongClient(9999,"localhost","clientId001");
 
         //屏蔽while循环（没有其他读写事件）就会触发心跳
 //        while (true){

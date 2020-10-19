@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 public class LongServer {
     private int port;
-    private SocketChannel socketChannel;
     public LongServer(int port) throws InterruptedException {
         this.port = port;
         bind();
