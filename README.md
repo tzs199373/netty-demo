@@ -16,9 +16,21 @@
 
 # longConnection 
 
-自定义消息协议通讯及心跳检测例子
+客户端发送心跳：
 
-client一段时间没有读写事件，就会触发userEventTriggered事件，前提是有IdleStateHandler。该方法中发送ping消息（心跳）。
+client一段时间没有读写事件，就会触发userEventTriggered事件，前提是有IdleStateHandler。该方法中发送ping消息（心跳）。本例中心跳是否开启通过ClientInfo.isOpenHeartBeat设置。
+
+Channel绑定自定义属性：
+
+使用AttributeKey与Attribute
+
+服务端检测读空闲：
+
+ReadTimeoutHandler如果超过设置的时间，主动断开，此时触发channelInactive事件，移除缓存连接
+
+客户端断线重连：
+
+服务端主动断开时，客户端也会触发channelInactive事件，再次执行doConnect方法，重新连接
 
 # uploadChunkFile
 
