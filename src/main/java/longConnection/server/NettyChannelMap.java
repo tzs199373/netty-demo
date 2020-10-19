@@ -17,7 +17,7 @@ public class NettyChannelMap {
     public static void remove(SocketChannel socketChannel){
         for (Map.Entry entry:map.entrySet()){
             if (entry.getValue()==socketChannel){
-                System.out.println("ÒÆ³ý channel["+entry.getKey()+" ]»º´æ");
+                System.out.println("ÒÆ³ý channel["+entry.getKey()+"] »º´æ");
                 map.remove(entry.getKey());
             }
         }

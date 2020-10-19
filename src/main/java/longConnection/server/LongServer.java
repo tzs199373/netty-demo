@@ -32,7 +32,7 @@ public class LongServer {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
                 ChannelPipeline p = socketChannel.pipeline();
-                p.addLast(new ReadTimeoutHandler(20));
+                p.addLast(new ReadTimeoutHandler(20));//读空闲超时，服务端主动关闭连接
                 p.addLast(new ObjectEncoder());
                 p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
                 p.addLast(new NettyServerHandler());

@@ -39,8 +39,10 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
                     }
                     break;
                 case READER_IDLE:
+                    ctx.fireUserEventTriggered(evt);
                     break;
                 case ALL_IDLE:
+                    ctx.fireUserEventTriggered(evt);
                     break;
                 default:
                     break;
