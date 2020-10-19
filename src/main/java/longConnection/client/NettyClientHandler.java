@@ -14,6 +14,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
             switch (e.state()) {
                 case WRITER_IDLE:
                     PingMsg pingMsg=new PingMsg();
+                    pingMsg.setClientId("clientId001");
                     ctx.writeAndFlush(pingMsg);
                     System.out.println("send ping to server----------");
                     break;
@@ -34,6 +35,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
             case LOGIN:{
                 //向服务器发起登录
                 LoginMsg loginMsg=new LoginMsg();
+                loginMsg.setClientId("clientId001");
                 loginMsg.setPassword("yao");
                 loginMsg.setUserName("robin");
                 channelHandlerContext.writeAndFlush(loginMsg);
@@ -44,6 +46,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
             case ASK:{
                 ReplyClientBody replyClientBody=new ReplyClientBody("client info **** !!!");
                 ReplyMsg replyMsg=new ReplyMsg();
+                replyMsg.setClientId("clientId001");
                 replyMsg.setBody(replyClientBody);
                 channelHandlerContext.writeAndFlush(replyMsg);
             }break;

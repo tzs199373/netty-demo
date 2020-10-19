@@ -32,6 +32,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<BaseMsg> {
             case PING:{
                 PingMsg pingMsg=(PingMsg)baseMsg;
                 PingMsg pingReply=new PingMsg();
+                System.out.println("receive ping from "+pingMsg.getClientId()+"----------");
                 NettyChannelMap.get(pingMsg.getClientId()).writeAndFlush(pingReply);
             }break;
             case ASK:{

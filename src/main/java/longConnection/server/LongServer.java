@@ -44,14 +44,6 @@ public class LongServer {
         }
     }
     public static void main(String []args) throws InterruptedException {
-        LongServer longServer = new LongServer(9999);
-        while (true){
-            SocketChannel channel=(SocketChannel)NettyChannelMap.get("001");
-            if(channel!=null){
-                AskMsg askMsg=new AskMsg();
-                channel.writeAndFlush(askMsg);
-            }
-            TimeUnit.SECONDS.sleep(1000);
-        }
+        new LongServer(9999);
     }
 }

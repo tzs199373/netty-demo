@@ -51,22 +51,22 @@ public class LongClient {
         }
     }
     public static void main(String[]args) throws InterruptedException {
-        Constants.setClientId("001");
         LongClient client =new LongClient(9999,"localhost");
 
         LoginMsg loginMsg=new LoginMsg();
+        loginMsg.setClientId("clientId001");
         loginMsg.setPassword("yao");
         loginMsg.setUserName("robin");
         client.socketChannel.writeAndFlush(loginMsg);
 
         //屏蔽while循环（没有其他读写事件）就会触发心跳
-        while (true){
-            TimeUnit.SECONDS.sleep(3);
-            AskMsg askMsg=new AskMsg();
-            AskParams askParams=new AskParams();
-            askParams.setAuth("authToken");
-            askMsg.setParams(askParams);
-            client.socketChannel.writeAndFlush(askMsg);
-        }
+//        while (true){
+//            TimeUnit.SECONDS.sleep(3);
+//            AskMsg askMsg=new AskMsg();
+//            AskParams askParams=new AskParams();
+//            askParams.setAuth("authToken");
+//            askMsg.setParams(askParams);
+//            client.socketChannel.writeAndFlush(askMsg);
+//        }
     }
 }
