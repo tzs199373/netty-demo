@@ -1,10 +1,7 @@
 package longConnection.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -16,6 +13,7 @@ import io.netty.util.Attribute;
 import longConnection.share.module.LoginMsg;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static longConnection.client.Constants.CLIENT_INFO_ATTRIBUTE_KEY;
 
@@ -44,15 +42,40 @@ public class LongClient {
                 socketChannel.pipeline().addLast(new NettyClientHandler());
             }
         });
-        ChannelFuture future =bootstrap.connect(host,port).sync();
+        doConnect(bootstrap,clientId,isOpenHeartBeat);
+    }
+
+    private void doConnect(Bootstrap bootstrap,String clientId,boolean isOpenHeartBeat) throws InterruptedException {
+        ChannelFuture future = bootstrap.connect(host,port).sync();
+
+        future.addListener(new ChannelFutureListener() {
+            public void operationComplete(ChannelFuture futureListener) throws Exception {
+                if (futureListener.isSuccess()) {
+                    System.out.println("client["+clientId+"] connect server  成功---------");
+                } else {
+                    System.out.println("Failed to connect to server, try connect after 10s");
+
+                    futureListener.channel().eventLoop().schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                doConnect(bootstrap,clientId,isOpenHeartBeat);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, 10, TimeUnit.SECONDS);
+                }
+            }
+        });
+
         if (future.isSuccess()) {
             SocketChannel socketChannel = (SocketChannel)future.channel();
-            System.out.println("client["+clientId+"] connect server  成功---------");
+//            System.out.println("client["+clientId+"] connect server  成功---------");
             //将客户端ID绑定至Channel
             Attribute<ClientInfo> attr = socketChannel.attr(CLIENT_INFO_ATTRIBUTE_KEY);
             attr.setIfAbsent(new ClientInfo(clientId,isOpenHeartBeat,new Date()));
-
-
+            //登陆请求
             LoginMsg loginMsg=new LoginMsg();
             loginMsg.setClientId(clientId);
             loginMsg.setPassword("yao");
@@ -60,6 +83,7 @@ public class LongClient {
             socketChannel.writeAndFlush(loginMsg);
         }
     }
+
     public static void main(String[]args) throws InterruptedException {
         new LongClient(9999,"localhost").start("clientId001",true);
     }
