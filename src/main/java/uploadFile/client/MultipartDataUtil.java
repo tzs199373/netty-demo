@@ -75,10 +75,8 @@ public class MultipartDataUtil {
         //请求行
         StringBuilder head = new StringBuilder("POST ").append(uri).append(" HTTP/1.1").append("\r\n");
         //首部字段
-//        head.append("User-Agent: PostmanRuntime/7.26.5").append("\r\n");
 //        head.append("Accept: */*").append("\r\n");
 //        head.append("Cache-Control: no-cache").append("\r\n");
-//        head.append("Postman-Token: 7be7f8eb-a9f5-49b4-85f2-3a228dffbec7").append("\r\n");
         head.append("Host: ").append(remoteAddress).append(":").append(remotePort).append("\r\n");
 //        head.append("Accept-Encoding: gzip, deflate, br").append("\r\n");
 //        head.append("Connection: keep-alive").append("\r\n");
