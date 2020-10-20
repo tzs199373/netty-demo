@@ -84,6 +84,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<BaseMsg> {
             }
             default:break;
         }
-        ReferenceCountUtil.release(msgType);
+        ReferenceCountUtil.release(baseMsg);
     }
 }
