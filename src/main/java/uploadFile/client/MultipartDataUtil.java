@@ -15,8 +15,7 @@ import java.util.Map;
 public class MultipartDataUtil {
 
     public static void postMultipartData(Channel channel) throws IOException {
-//        String uri = "/LAPI/V1.0/PACS/GUI/PicFile?Type=2";
-        String uri = "/file/upload";
+        String uri = "/LAPI/V1.0/PACS/GUI/PicFile?Type=2";
 
         Map<String,String> fliedMap  = new HashMap<>();
         fliedMap.put("k1","v1");
