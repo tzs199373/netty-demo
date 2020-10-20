@@ -1,4 +1,4 @@
-package uploadFile;
+package uploadFile.client;
 
 import java.io.File;
 
