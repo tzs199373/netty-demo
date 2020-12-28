@@ -1,4 +1,4 @@
-package httpServer;
+package http.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
