@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Client {
-    public static void main(String[] args) {
-        new Client().start("");
-    }
+
+    private static String ip = "192.168.137.67";
+    private static int port = 2223;
 
     public void start(String msg){
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -53,7 +53,7 @@ public class Client {
                 }
             });
 
-            ChannelFuture f = b.connect("127.0.0.1", 2223).sync();
+            ChannelFuture f = b.connect(ip, port).sync();
 //            Channel channel = f.channel();
 
         } catch(Exception e) {
@@ -66,9 +66,14 @@ public class Client {
         FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,method,uri,content);
         HttpHeaders headers = request.headers();
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
+        .set(HttpHeaderNames.HOST, ip+":"+port)
         .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
         headerMap.forEach((key, value) -> headers.set(key, value));
         System.out.println("FullHttpRequest:"+request);
         return request;
+    }
+
+    public static void main(String[] args) {
+        new Client().start("");
     }
 }
