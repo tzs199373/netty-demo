@@ -12,6 +12,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,11 @@ public class Client {
                             .addLast(new ChannelInboundHandlerAdapter() {
                                 @Override
                                 public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                    System.out.println("client read:"+msg);
+                                    if(msg instanceof FullHttpResponse){
+                                        System.out.println("client read:"+((FullHttpResponse) msg).content().toString(StandardCharsets.UTF_8));
+                                    }else{
+                                        System.out.println("client read:"+msg);
+                                    }
                                 }
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -54,7 +59,6 @@ public class Client {
             });
 
             ChannelFuture f = b.connect(ip, port).sync();
-//            Channel channel = f.channel();
 
         } catch(Exception e) {
             e.printStackTrace();
@@ -74,6 +78,6 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        new Client().start("");
+        new Client().start("msg=111");
     }
 }
