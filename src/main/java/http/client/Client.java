@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class Client {
     public static void main(String[] args) {
-        new Client().start("key=value");
+        new Client().start("");
     }
 
     public void start(String msg){
@@ -68,6 +68,7 @@ public class Client {
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
         .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
         headerMap.forEach((key, value) -> headers.set(key, value));
+        System.out.println("FullHttpRequest:"+request);
         return request;
     }
 }
