@@ -23,12 +23,8 @@ public class HttpServer {
                     public void initChannel(SocketChannel ch)
                             throws Exception {
                         ch.pipeline()
-//                                .addLast("HttpRequestEncoder", new HttpRequestEncoder())
-//                                .addLast("HttpResponseEncoder", new HttpResponseEncoder())
-//                                .addLast("HttpResponseDecoder", new HttpResponseDecoder())
-//                                .addLast("HttpRequestDecoder", new HttpRequestDecoder())
-
                                 .addLast("HttpServerCodec",new HttpServerCodec())
+                                .addLast("HttpClientCodec",new HttpClientCodec())
                                 .addLast("aggregator", new HttpObjectAggregator(512 * 1024))
                                 .addLast("handler", new HttpHandler());
                     }
