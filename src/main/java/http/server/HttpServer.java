@@ -32,5 +32,6 @@ public class HttpServer {
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
         b.bind(port).sync();
+        System.out.println("success");
     }
 }

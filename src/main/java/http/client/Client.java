@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class Client {
 
-    private static String ip = "192.168.137.67";
+    private static String ip = "192.168.43.101";
     private static int port = 2223;
 
     public void start(String msg){
